@@ -33,6 +33,9 @@ innoextractCheck() {
           Ubuntu|Debian)
             sudo apt install innoextract
           ;;
+					*)
+						printf "Distribution not recognized!\n";
+						exit
         esac
 #        More please
         ;;    
