@@ -35,9 +35,9 @@ innoextractCheck() {
             printf "%s found. Proceeding with innoextract install via apt.\nYou may be prompted for your password.\n" "$(lsb_release --id | awk '{ print $3 }')";
             sudo apt install innoextract
           ;;
-					*)
-						printf "Distribution not recognized!\n";
-						exit
+          *)
+            printf "Distribution not recognized!\n";
+            exit
           ;;
         esac
 #        More please
