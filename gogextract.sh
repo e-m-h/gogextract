@@ -12,12 +12,12 @@ EXDIR=${EXDIR:-${PWD}}
 
 innoextractCheck() {
   if [[ $(command -v innoextract) ]]; then
-    printf "Innoextract found.\n"
+    printf "Innoextract found. Proceeding with extraction.\n"
     :
   else
     case $(uname -s) in
       Darwin)
-        printf "Using Mac, checking for Brew...\n";
+        printf "Using macOS, checking for Brew...\n";
           if [[ $(command -v brew) ]]; then 
             brew install innoextract
           else
@@ -28,14 +28,17 @@ innoextractCheck() {
       Linux)
         case $(lsb_release --id | awk '{ print $3 }') in
           Fedora)
+            printf "Fedora found. Proceeding with innoextract install via yum.\nYou may be prompted for your password.\n";
             sudo yum install innoextract
           ;;
           Ubuntu|Debian)
+            printf "%s found. Proceeding with innoextract install via apt.\nYou may be prompted for your password.\n" "$(lsb_release --id | awk '{ print $3 }')";
             sudo apt install innoextract
           ;;
 					*)
 						printf "Distribution not recognized!\n";
 						exit
+          ;;
         esac
 #        More please
         ;;    
