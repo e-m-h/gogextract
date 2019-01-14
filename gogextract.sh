@@ -9,6 +9,7 @@ unset -f command
 
 GAMEARCHIVE=${1}
 EXDIR=${EXDIR:-${PWD}}
+NEWDIR=$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr " " "_")
 
 innoextractCheck() {
   if [[ $(command -v innoextract) ]]; then
@@ -47,7 +48,13 @@ innoextractCheck() {
 }
 
 extractFiles() {
-  innoextract --exclude-temp "${GAMEARCHIVE}" -d "${EXDIR}"
+  if [[ -d "${EXDIR}" ]]; then
+    printf "Extracting to %s" "${EXDIR}\n";
+    innoextract --exclude-temp "${GAMEARCHIVE}" -d "${EXDIR}"
+  else
+    printf "Directory "${EXDIR}" does not exist. Exiting.\n";
+    exit
+  fi
 }
 
 removeFiles() {
@@ -61,10 +68,18 @@ removeFiles() {
     rm -rvf "${EXDIR}"/app/DOSBOX/;
   fi
   #Rename directory to game ID
-  mv "${EXDIR}"/app "$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1)"
+  mv "${EXDIR}"/app "${NEWDIR}"
 }
+
+createConfig() {
+  touch "${EXDIR}/${NEWDIR}"/start.sh
+  printf "dosbox -conf %s" "$(find $"${EXDIR}/${NEWDIR}" -iname "dosbox*single.conf")" > "${EXDIR}/${NEWDIR}"/start.sh
+  chmod 755 "${EXDIR}/${NEWDIR}"/start.sh
+}
+
 
 innoextractCheck
 extractFiles 
 removeFiles
+createConfig
 
