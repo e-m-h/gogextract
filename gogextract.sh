@@ -73,6 +73,8 @@ removeFiles() {
 
 createConfig() {
   touch "${EXDIR}/${NEWDIR}"/start.sh
+  #GOG DOSBox configs tend to use relative paths and fail to start the game if don't start from a subdirectory. This replaces parent directory with current.
+  sed -i "s/\.\./\./g" "$(find $"${EXDIR}/${NEWDIR}" -iname "dosbox*single.conf")"
   printf "dosbox -conf %s" "$(find $"${EXDIR}/${NEWDIR}" -iname "dosbox*single.conf")" > "${EXDIR}/${NEWDIR}"/start.sh
   chmod 755 "${EXDIR}/${NEWDIR}"/start.sh
 }
