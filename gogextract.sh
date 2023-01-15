@@ -11,6 +11,14 @@ GAMEARCHIVE=${1}
 EXDIR=${EXDIR:-${PWD}}
 NEWDIR=$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr " " "_")
 
+checkGamedir() {
+	if [[ $(innoextract -l ${GAMEARCHIVE} | grep -ic app) -gt 10 ]]; then
+		printf "A large number of files found in 'app' directory.\n"
+	else
+		printf "Smaller number of files found in 'app' directory.\n"
+	fi 
+}
+
 innoextractCheck() {
   if [[ $(command -v innoextract) ]]; then
     printf "Innoextract found. Proceeding with extraction.\n"
@@ -79,7 +87,7 @@ createConfig() {
   chmod 755 "${EXDIR}/${NEWDIR}"/start.sh
 }
 
-
+#checkGamedir
 innoextractCheck
 extractFiles 
 removeFiles
