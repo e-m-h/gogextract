@@ -12,11 +12,11 @@ EXDIR=${EXDIR:-${PWD}}
 NEWDIR=$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr " " "_")
 
 checkGamedir() {
-	if [[ $(innoextract -l ${GAMEARCHIVE} | grep -ic app) -gt 10 ]]; then
-		printf "A large number of files found in 'app' directory.\n"
-	else
-		printf "Smaller number of files found in 'app' directory.\n"
-	fi 
+  if [[ $(innoextract -l ${GAMEARCHIVE} | grep -ic app) -gt 10 ]]; then
+    printf "A large number of files found in 'app' directory.\n"
+  else
+    printf "Smaller number of files found in 'app' directory.\n"
+  fi 
 }
 
 innoextractCheck() {
@@ -92,3 +92,4 @@ innoextractCheck
 extractFiles 
 removeFiles
 createConfig
+
