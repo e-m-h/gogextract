@@ -92,4 +92,3 @@ innoextractCheck
 extractFiles 
 removeFiles
 createConfig
-
