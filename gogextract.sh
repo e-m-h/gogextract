@@ -9,7 +9,7 @@ unset -f command
 
 GAMEARCHIVE=${1}
 EXDIR=${EXDIR:-${PWD}}
-DESTDIR=$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr " " "_")
+DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr " " "_")"
 
 checkGamedir() {
   if [[ $(innoextract -l ${GAMEARCHIVE} | grep -ic app) -gt 10 ]]; then
@@ -56,12 +56,11 @@ innoextractCheck() {
 }
 
 extractFiles() {
-  if [[ -d "${EXDIR}" ]]; then
-    printf "Extracting to %s" "${EXDIR}\n";
-    innoextract --exclude-temp "${GAMEARCHIVE}" -d "${EXDIR}"
-  else
-    printf "Directory "${EXDIR}" does not exist. Exiting.\n";
+  if [[ -d "${DESTDIR}" ]]; then
+    printf "Destination directory already exists. Exiting."
     exit
+  else
+    innoextract --exclude-temp "${GAMEARCHIVE}" -d "${DESTDIR}"
   fi
 }
 
@@ -96,7 +95,7 @@ testThings() {
 checkGamedir
 testThings
 #innoextractCheck
-#extractFiles 
+extractFiles 
 #removeFiles
 #createConfig
 
