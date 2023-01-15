@@ -5,11 +5,12 @@
 
 # innoextract --exclude-temp
 
-unset -f command
+
+# unset -f command  # Not sure this is necessary
 
 GAMEARCHIVE=${1}
 EXDIR=${EXDIR:-${PWD}}
-DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr " " "_")"
+DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr -d " " | cut -c -8)"
 
 checkGamedir() {
   if [[ $(innoextract -l ${GAMEARCHIVE} | grep -ic app) -gt 10 ]]; then
@@ -95,7 +96,7 @@ testThings() {
 checkGamedir
 testThings
 #innoextractCheck
-extractFiles 
+#extractFiles 
 #removeFiles
 #createConfig
 
