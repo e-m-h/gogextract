@@ -9,7 +9,7 @@ unset -f command
 
 GAMEARCHIVE=${1}
 EXDIR=${EXDIR:-${PWD}}
-NEWDIR=$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr " " "_")
+DESTDIR=$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr " " "_")
 
 checkGamedir() {
   if [[ $(innoextract -l ${GAMEARCHIVE} | grep -ic app) -gt 10 ]]; then
@@ -76,20 +76,27 @@ removeFiles() {
     rm -rvf "${EXDIR}"/app/DOSBOX/;
   fi
   #Rename directory to game ID
-  mv "${EXDIR}"/app "${NEWDIR}"
+  mv "${EXDIR}"/app "${DESTDIR}"
 }
 
 createConfig() {
-  touch "${EXDIR}/${NEWDIR}"/start.sh
+  touch "${EXDIR}/${DESTDIR}"/start.sh
   #GOG DOSBox configs tend to use relative paths and fail to start the game if don't start from a subdirectory. This replaces parent directory with current.
-  sed -i "s/\.\./\./g" "$(find $"${EXDIR}/${NEWDIR}" -iname "dosbox*single.conf")"
-  printf "dosbox -conf %s" "$(find $"${EXDIR}/${NEWDIR}" -iname "dosbox*single.conf")" > "${EXDIR}/${NEWDIR}"/start.sh
-  chmod 755 "${EXDIR}/${NEWDIR}"/start.sh
+  sed -i "s/\.\./\./g" "$(find $"${EXDIR}/${DESTDIR}" -iname "dosbox*single.conf")"
+  printf "dosbox -conf %s" "$(find $"${EXDIR}/${DESTDIR}" -iname "dosbox*single.conf")" > "${EXDIR}/${DESTDIR}"/start.sh
+  chmod 755 "${EXDIR}/${DESTDIR}"/start.sh
 }
 
-#checkGamedir
-innoextractCheck
-extractFiles 
-removeFiles
-createConfig
+testThings() {
+  # Test variable assignment and other things
+  printf "EXDIR = %s \n" "${EXDIR}"
+  printf "DESTDIR = %s \n" "${DESTDIR}"
+}
+
+checkGamedir
+testThings
+#innoextractCheck
+#extractFiles 
+#removeFiles
+#createConfig
 
