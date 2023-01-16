@@ -60,22 +60,18 @@ extractFiles() {
 
 removeFiles() {
   printf "Removing extraneous files from %s/ (commonappdata and DOSBox/GOG files).\n" "${DESTDIR}";
-  find "${DESTDIR}" -iname "commonappdata" -exec rm -rvf {} \;
-  find "${DESTDIR}" -iname "webcache.zip" -exec rm -vf {} \;
-  #rm -rfv "${DESTDIR}"/commonappdata;
-  find "${DESTDIR}" -iname "*goggame*" -exec rm -vf {} \;
-  find "${DESTDIR}" -iname "__support" -exec rm -rvf {} \;
-  find "${DESTDIR}" -iname "__redist" -exec rm -rvf {} \;
-  #rm -vf "${DESTDIR}"/app/webcache.zip;
-  #rm -vf "${DESTDIR}"/app/GameuxInstallHelper.dll;
-  #rm -rvf "${DESTDIR}"/app/__support/
+  find "${DESTDIR}" -type f '(' -name "webcache.zip" -o -name "GameuxInstallHelper.dll" -o -name "goggame*" ')' -exec rm -rfv {} \; 2>/dev/null
+  find "${DESTDIR}" -type d '(' -name "commonappdata" -o -name "__support" -o -name "__redist" ')' -exec rm -rfv {} \; 2>/dev/null
+
   if [[ -d "${DESTDIR}"/app/DOSBOX/ ]]; then
     rm -rvf "${DESTDIR}"/app/DOSBOX/;
   fi
-  #Rename directory to game ID
+
+  #If the game data is located within the 'app' subdirectory, move it to base directory
   if [[ $(ls ${DESTDIR}/app/ | wc -l ) -gt 10 ]]; then
     mv "${DESTDIR}"/app/* "${DESTDIR}/"
   fi
+
   rmdir "${DESTDIR}"/app/
 }
 
@@ -94,7 +90,7 @@ testThings() {
 }
 
 
-testThings
+#testThings
 #innoextractCheck
 extractFiles 
 removeFiles
