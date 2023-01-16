@@ -12,13 +12,6 @@ GAMEARCHIVE=${1}
 EXDIR=${EXDIR:-${PWD}}
 DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr -d " " | cut -c -8)"
 
-checkGamedir() {
-  if [[ $(ls ${DESTDIR}/app/ | wc -l ) -gt 10 ]]; then
-    printf "A large number of files found in 'app' directory.\n"
-  else
-    printf "Smaller number of files found in 'app' directory.\n"
-  fi 
-}
 
 innoextractCheck() {
   if [[ $(command -v innoextract) ]]; then
@@ -106,4 +99,4 @@ testThings
 extractFiles 
 removeFiles
 #createConfig
-checkGamedir
+
