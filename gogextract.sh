@@ -67,16 +67,23 @@ extractFiles() {
 
 removeFiles() {
   printf "Removing extraneous files from %s/ (commonappdata and DOSBox/GOG files).\n" "${DESTDIR}";
-  rm -rfv "${DESTDIR}"/commonappdata;
+  find "${DESTDIR}" -iname "commonappdata" -exec rm -rvf {} \;
+  find "${DESTDIR}" -iname "webcache.zip" -exec rm -vf {} \;
+  #rm -rfv "${DESTDIR}"/commonappdata;
   find "${DESTDIR}" -iname "*goggame*" -exec rm -vf {} \;
-  rm -vf "${DESTDIR}"/app/webcache.zip;
-  rm -vf "${DESTDIR}"/app/GameuxInstallHelper.dll;
-  rm -rvf "${DESTDIR}"/app/__support/
+  find "${DESTDIR}" -iname "__support" -exec rm -rvf {} \;
+  find "${DESTDIR}" -iname "__redist" -exec rm -rvf {} \;
+  #rm -vf "${DESTDIR}"/app/webcache.zip;
+  #rm -vf "${DESTDIR}"/app/GameuxInstallHelper.dll;
+  #rm -rvf "${DESTDIR}"/app/__support/
   if [[ -d "${DESTDIR}"/app/DOSBOX/ ]]; then
     rm -rvf "${DESTDIR}"/app/DOSBOX/;
   fi
   #Rename directory to game ID
-  mv "${DESTDIR}"/app "${DESTDIR}"
+  if [[ $(ls ${DESTDIR}/app/ | wc -l ) -gt 10 ]]; then
+    mv "${DESTDIR}"/app/* "${DESTDIR}/"
+  fi
+  rmdir "${DESTDIR}"/app/
 }
 
 createConfig() {
@@ -97,6 +104,6 @@ testThings() {
 testThings
 #innoextractCheck
 extractFiles 
-#removeFiles
+removeFiles
 #createConfig
 checkGamedir
