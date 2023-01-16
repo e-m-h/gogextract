@@ -13,7 +13,7 @@ EXDIR=${EXDIR:-${PWD}}
 DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr -d " " | cut -c -8)"
 
 checkGamedir() {
-  if [[ $(innoextract -l ${GAMEARCHIVE} | grep -ic app) -gt 10 ]]; then
+  if [[ $(ls ${DESTDIR}/app/ | wc -l ) -gt 10 ]]; then
     printf "A large number of files found in 'app' directory.\n"
   else
     printf "Smaller number of files found in 'app' directory.\n"
@@ -58,7 +58,7 @@ innoextractCheck() {
 
 extractFiles() {
   if [[ -d "${DESTDIR}" ]]; then
-    printf "Destination directory already exists. Exiting."
+    printf "Destination directory already exists. Exiting.\n"
     exit
   else
     innoextract --exclude-temp "${GAMEARCHIVE}" -d "${DESTDIR}"
@@ -66,17 +66,17 @@ extractFiles() {
 }
 
 removeFiles() {
-  printf "Removing extraneous files from %s/ (commonappdata and DOSBox/GOG files).\n" "${EXDIR}";
-  rm -rfv "${EXDIR}"/commonappdata;
-  find "${EXDIR}" -iname "*goggame*" -exec rm -vf {} \;
-  rm -vf "${EXDIR}"/app/webcache.zip;
-  rm -vf "${EXDIR}"/app/GameuxInstallHelper.dll;
-  rm -rvf "${EXDIR}"/app/__support/
-  if [[ -d "${EXDIR}"/app/DOSBOX/ ]]; then
-    rm -rvf "${EXDIR}"/app/DOSBOX/;
+  printf "Removing extraneous files from %s/ (commonappdata and DOSBox/GOG files).\n" "${DESTDIR}";
+  rm -rfv "${DESTDIR}"/commonappdata;
+  find "${DESTDIR}" -iname "*goggame*" -exec rm -vf {} \;
+  rm -vf "${DESTDIR}"/app/webcache.zip;
+  rm -vf "${DESTDIR}"/app/GameuxInstallHelper.dll;
+  rm -rvf "${DESTDIR}"/app/__support/
+  if [[ -d "${DESTDIR}"/app/DOSBOX/ ]]; then
+    rm -rvf "${DESTDIR}"/app/DOSBOX/;
   fi
   #Rename directory to game ID
-  mv "${EXDIR}"/app "${DESTDIR}"
+  mv "${DESTDIR}"/app "${DESTDIR}"
 }
 
 createConfig() {
@@ -93,10 +93,10 @@ testThings() {
   printf "DESTDIR = %s \n" "${DESTDIR}"
 }
 
-checkGamedir
+
 testThings
 #innoextractCheck
-#extractFiles 
+extractFiles 
 #removeFiles
 #createConfig
-
+checkGamedir
