@@ -14,39 +14,35 @@ DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 
 
 
 innoextractCheck() {
-  if [[ $(command -v innoextract) ]]; then
-    printf "Innoextract found. Proceeding with extraction.\n"
-    :
-  else
-    case $(uname -s) in
-      Darwin)
-        printf "Using macOS, checking for Brew...\n";
-          if [[ $(command -v brew) ]]; then 
-            brew install innoextract
-          else
-            printf "Homebrew not found. Install Homebrew or innoextract to continue.";
-            exit 
-          fi
-        ;;
-      Linux)
-        case $(lsb_release --id | awk '{ print $3 }') in
-          Fedora)
-            printf "Fedora found. Proceeding with innoextract install via yum.\nYou may be prompted for your password.\n";
+   if [[ $(command -v innoextract) ]]; then
+     printf "Innoextract found. Proceeding with extraction.\n"
+   else
+      if [[ $( uname -s ) == 'Linux' ]]; then
+        case $( grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" '{print $2} ') in
+          Fedora|fedora)
+            printf "Fedora found. Proceeding with innoextract install via yum. You may be prompted for your password.\n"
             sudo yum install innoextract
-          ;;
-          Ubuntu|Debian)
-            printf "%s found. Proceeding with innoextract install via apt.\nYou may be prompted for your password.\n" "$(lsb_release --id | awk '{ print $3 }')";
+            ;;
+          Debian|debian)
+            printf "Debian found. Proceeding with innoextract install via apt. You may be prompted for your password.\n"
             sudo apt install innoextract
-          ;;
+            ;;
           *)
-            printf "Distribution not recognized!\n";
+            printf "Distribution not recognized. Exiting.\n"
             exit
-          ;;
+            ;;
         esac
-#        More please
-        ;;    
-    esac
-  fi
+      fi
+      # Darwin)
+      #   printf "Using macOS, checking for Brew...\n";
+      #     if [[ $(command -v brew) ]]; then 
+      #       brew install innoextract
+      #     else
+      #       printf "Homebrew not found. Install Homebrew or innoextract to continue.";
+      #       exit 
+      #     fi
+      #   ;;
+    fi
 }
 
 extractFiles() {
@@ -59,12 +55,14 @@ extractFiles() {
 }
 
 removeFiles() {
-  # Find the DOSBox confs and move them
+  # We don't actually know where the DOSBox config files will be from package to package, so
+  # find and move them before deleting things. Discard error output if we don't find DOSBox config(s). 
   printf "Moving DOSBox configuration files...\n"
-  find "${DESTDIR}" -iname "dosbox*.conf" -exec mv {} "${DESTDIR}"/ \;
+  find "${DESTDIR}" -iname "dosbox*.conf" -exec mv {} "${DESTDIR}"/ \; 2>/dev/null
 
   printf "Removing extraneous files from %s/ (commonappdata and DOSBox/GOG files).\n" "${DESTDIR}";
-  find "${DESTDIR}" -type f '(' -name "webcache.zip" -o -name "GameuxInstallHelper.dll" -o -name "goggame*" ')' -exec rm -rfv {} \; 2>/dev/null
+  find "${DESTDIR}" -type f '(' -name "webcache.zip" -o -name "GameuxInstallHelper.dll" -o -name "goggame*" ')' -exec rm -rfv {} \; \
+    2>/dev/null
   find "${DESTDIR}" -type d '(' -name "commonappdata" -o -name "__support" -o -name "__redist" ')' -exec rm -rfv {} \; 2>/dev/null
 
   if [[ -d "${DESTDIR}"/app/DOSBOX/ ]]; then
@@ -97,8 +95,8 @@ testThings() {
 
 
 #testThings
-#innoextractCheck
-extractFiles 
-removeFiles
-createConfig
+innoextractCheck
+# extractFiles 
+# removeFiles
+# createConfig
 
