@@ -59,6 +59,10 @@ extractFiles() {
 }
 
 removeFiles() {
+  # Find the DOSBox confs and move them
+  printf "Moving DOSBox configuration files...\n"
+  find "${DESTDIR}" -iname "dosbox*.conf" -exec mv {} "${DESTDIR}"/ \;
+
   printf "Removing extraneous files from %s/ (commonappdata and DOSBox/GOG files).\n" "${DESTDIR}";
   find "${DESTDIR}" -type f '(' -name "webcache.zip" -o -name "GameuxInstallHelper.dll" -o -name "goggame*" ')' -exec rm -rfv {} \; 2>/dev/null
   find "${DESTDIR}" -type d '(' -name "commonappdata" -o -name "__support" -o -name "__redist" ')' -exec rm -rfv {} \; 2>/dev/null
@@ -67,20 +71,22 @@ removeFiles() {
     rm -rvf "${DESTDIR}"/app/DOSBOX/;
   fi
 
-  #If the game data is located within the 'app' subdirectory, move it to base directory
+  # If the game data is located within the 'app' subdirectory, move it to base directory
   if [[ $(ls ${DESTDIR}/app/ | wc -l ) -gt 10 ]]; then
     mv "${DESTDIR}"/app/* "${DESTDIR}/"
   fi
 
+  # Remove the remaining 'app' directory
   rmdir "${DESTDIR}"/app/
 }
 
 createConfig() {
-  touch "${EXDIR}/${DESTDIR}"/start.sh
-  #GOG DOSBox configs tend to use relative paths and fail to start the game if don't start from a subdirectory. This replaces parent directory with current.
-  sed -i "s/\.\./\./g" "$(find $"${EXDIR}/${DESTDIR}" -iname "dosbox*single.conf")"
-  printf "dosbox -conf %s" "$(find $"${EXDIR}/${DESTDIR}" -iname "dosbox*single.conf")" > "${EXDIR}/${DESTDIR}"/start.sh
-  chmod 755 "${EXDIR}/${DESTDIR}"/start.sh
+  touch "${DESTDIR}"/start.sh
+
+  # GOG DOSBox configs tend to use relative paths and fail to start the game if don't start from a subdirectory. This replaces parent directory with current.
+  sed -i "s/\.\./\./g" "$(find "${DESTDIR}" -iname "dosbox*single.conf")"
+  printf "dosbox -conf %s" "$(find "${DESTDIR}" -iname "dosbox*single.conf")" > "${DESTDIR}"/start.sh
+  chmod 755 "${DESTDIR}"/start.sh
 }
 
 testThings() {
@@ -94,5 +100,5 @@ testThings() {
 #innoextractCheck
 extractFiles 
 removeFiles
-#createConfig
+createConfig
 
