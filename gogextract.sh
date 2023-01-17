@@ -10,29 +10,25 @@
 
 GAMEARCHIVE=${1}
 EXDIR=${EXDIR:-${PWD}}
-DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr -d " " | cut -c -8)"
 
 
-innoextractCheck() {
-   if [[ $(command -v innoextract) ]]; then
-     printf "Innoextract found. Proceeding with extraction.\n"
-   else
-      if [[ $( uname -s ) == 'Linux' ]]; then
-        case $( grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" '{print $2} ') in
-          Fedora|fedora)
-            printf "Fedora found. Proceeding with innoextract install via yum. You may be prompted for your password.\n"
-            sudo yum install innoextract
-            ;;
-          Debian|debian)
-            printf "Debian found. Proceeding with innoextract install via apt. You may be prompted for your password.\n"
-            sudo apt install innoextract
-            ;;
-          *)
-            printf "Distribution not recognized. Exiting.\n"
-            exit
-            ;;
-        esac
-      fi
+innoextractInstall() {
+    if [[ $( uname -s ) == 'Linux' ]]; then
+      case $( grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" '{print $2} ') in
+        Fedora|fedora)
+          printf "Fedora found. Proceeding with innoextract install via yum. You may be prompted for your password.\n"
+          sudo yum install innoextract
+          ;;
+        Debian|debian)
+          printf "Debian found. Proceeding with innoextract install via apt. You may be prompted for your password.\n"
+          sudo apt install innoextract
+          ;;
+        *)
+          printf "Distribution not recognized. Exiting.\n"
+          exit
+          ;;
+      esac
+    fi
       # Darwin)
       #   printf "Using macOS, checking for Brew...\n";
       #     if [[ $(command -v brew) ]]; then 
@@ -42,7 +38,6 @@ innoextractCheck() {
       #       exit 
       #     fi
       #   ;;
-    fi
 }
 
 extractFiles() {
@@ -81,7 +76,8 @@ removeFiles() {
 createConfig() {
   touch "${DESTDIR}"/start.sh
 
-  # GOG DOSBox configs tend to use relative paths and fail to start the game if don't start from a subdirectory. This replaces parent directory with current.
+  # GOG DOSBox configs tend to use relative paths and fail to start the game if don't start from a subdirectory. 
+  # This replaces parent directory with current.
   sed -i "s/\.\./\./g" "$(find "${DESTDIR}" -iname "dosbox*single.conf")"
   printf "dosbox -conf %s" "$(find "${DESTDIR}" -iname "dosbox*single.conf")" > "${DESTDIR}"/start.sh
   chmod 755 "${DESTDIR}"/start.sh
@@ -93,10 +89,20 @@ testThings() {
   printf "DESTDIR = %s \n" "${DESTDIR}"
 }
 
+if [[ $(command -v innoextract) ]]; then
+  if [[ $# -gt 0 ]]; then
+    DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr -d " " | cut -c -8)"
+    #printf 'Innoextract found.\n'
+    extractFiles
+    removeFiles
+    createConfig
+  else
+    printf "No argument given. Exiting.\n"
+    exit
+  fi
+else
+  innoextractInstall
+fi
 
-#testThings
-innoextractCheck
-# extractFiles 
-# removeFiles
-# createConfig
+
 
