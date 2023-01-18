@@ -92,7 +92,7 @@ if [[ $(command -v innoextract) ]]; then
     DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr -d " " | cut -c -8)"
     extractFiles
     removeFiles
-    if [[ $( ls "${DESTDIR}"/dosbox* | wc -l ) -gt 1 ]]; then
+    if [[ $( ls "${DESTDIR}"/ | grep -c dosbox ) -ge 1 ]]; then
       createConfig
     fi
   else
