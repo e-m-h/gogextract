@@ -30,11 +30,11 @@ innoextractInstall() {
       esac
     fi
       # Darwin)
-      #   printf "Using macOS, checking for Brew...\n";
+      #   printf "Using macOS, checking for Homebrew...\n";
       #     if [[ $(command -v brew) ]]; then 
       #       brew install innoextract
       #     else
-      #       printf "Homebrew not found. Install Homebrew or innoextract to continue.";
+      #       printf "Homebrew not found. Install Homebrew or innoextract to continue.\n";
       #       exit 
       #     fi
       #   ;;
@@ -65,7 +65,7 @@ removeFiles() {
   fi
 
   # If the game data is located within the 'app' subdirectory, move it to base directory
-  if [[ $(ls ${DESTDIR}/app/ | wc -l ) -gt 10 ]]; then
+  if [[ $( ls "${DESTDIR}"/app/ | wc -l ) -gt 10 ]]; then
     mv "${DESTDIR}"/app/* "${DESTDIR}/"
   fi
 
@@ -83,19 +83,18 @@ createConfig() {
   chmod 755 "${DESTDIR}"/start.sh
 }
 
-testThings() {
-  # Test variable assignment and other things
-  printf "EXDIR = %s \n" "${EXDIR}"
-  printf "DESTDIR = %s \n" "${DESTDIR}"
-}
+
+# Main
 
 if [[ $(command -v innoextract) ]]; then
   if [[ $# -gt 0 ]]; then
+    # Determine the name of the game and create our $DESTDIR by removing spaces and truncating to 8 characters
     DESTDIR="${EXDIR}/$(innoextract --gog-game-id "${GAMEARCHIVE}" | cut -d '"' -f2 | head -n1 | tr -d " " | cut -c -8)"
-    #printf 'Innoextract found.\n'
     extractFiles
     removeFiles
-    createConfig
+    if [[ $( ls "${DESTDIR}"/dosbox* | wc -l ) -gt 1 ]]; then
+      createConfig
+    fi
   else
     printf "No argument given. Exiting.\n"
     exit
