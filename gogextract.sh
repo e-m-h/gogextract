@@ -12,31 +12,31 @@ GAMEARCHIVE=${1}
 
 
 innoextractInstall() {
-    if [[ $( uname -s ) == 'Linux' ]]; then
-      case $( grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" '{print $2} ') in
-        Fedora|fedora)
-          printf "** Fedora found. Proceeding with innoextract install via yum. You may be prompted for your password. **\n"
-          sudo yum install innoextract
-          ;;
-        Debian|debian)
-          printf "** Debian found. Proceeding with innoextract install via apt. You may be prompted for your password. **\n"
-          sudo apt install innoextract
-          ;;
-        *)
-          printf "Distribution not recognized. Exiting.\n"
-          exit
-          ;;
-      esac
-    fi
-      # Darwin)
-      #   printf "Using macOS, checking for Homebrew...\n";
-      #     if [[ $(command -v brew) ]]; then 
-      #       brew install innoextract
-      #     else
-      #       printf "Homebrew not found. Install Homebrew or innoextract to continue.\n";
-      #       exit 
-      #     fi
-      #   ;;
+  if [[ $( uname -s ) == 'Linux' ]]; then
+    case $( grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" '{print $2} ') in
+      Fedora|fedora)
+        printf "** Fedora found. Proceeding with innoextract install via yum. You may be prompted for your password. **\n"
+        sudo yum install innoextract
+        ;;
+      Debian|debian)
+        printf "** Debian found. Proceeding with innoextract install via apt. You may be prompted for your password. **\n"
+        sudo apt install innoextract
+        ;;
+      *)
+        printf "Distribution not recognized. Exiting.\n"
+        exit
+        ;;
+    esac
+  fi
+    # Darwin)
+    #   printf "Using macOS, checking for Homebrew...\n";
+    #     if [[ $(command -v brew) ]]; then 
+    #       brew install innoextract
+    #     else
+    #       printf "Homebrew not found. Install Homebrew or innoextract to continue.\n";
+    #       exit 
+    #     fi
+    #   ;;
 }
 
 extractFiles() {
