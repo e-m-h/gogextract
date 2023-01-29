@@ -63,9 +63,13 @@ removeFiles() {
   find "${DESTDIR}" -type d '(' -name "commonappdata" -o -name "__support" -o -name "__redist" ')' -exec rm -rfv {} \; 2>/dev/null
   printf "\n"
 
-  if [[ -d "${DESTDIR}"/app/DOSBOX/ ]]; then
+  if [[ -d "${DESTDIR}/app/DOSBOX/" ]]; then
     printf "** Removing DOSBox files from %s/ **\n" "${DESTDIR}"
-    rm -rvf "${DESTDIR}"/app/DOSBOX/ 
+    rm -rvf "${DESTDIR}/app/DOSBOX/"
+    printf "\n"
+  elif [[ -d "${DESTDIR}/DOSBOX/" ]]; then
+    printf "** Removing DOSBox files from %s/ **\n" "${DESTDIR}"
+    rm -rvf "${DESTDIR}/DOSBOX/"
     printf "\n"
   fi
 
