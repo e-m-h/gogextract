@@ -3,23 +3,19 @@
 # Use innoextract to unpackage GOG games while removing extraneous files (e.g. DOSBox)
 # Create appropriate directory using GOG ID (maybe capitalize and truncate to 8 characters)
 
-# innoextract --exclude-temp
-
-
-# unset -f command  # Not sure this is necessary
 
 GAMEARCHIVE=${1}
 
 
 innoextractInstall() {
-  if [[ $( uname -s ) == 'Linux' ]]; then
-    case $( grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" '{print $2} ') in
+  if [[ $(uname -s) == 'Linux' ]]; then
+    case $(grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" '{print $2}' | head -n1) in
       Fedora|fedora)
         printf "** Fedora found. Proceeding with innoextract install via yum. You may be prompted for your password. **\n"
         sudo yum install innoextract
         ;;
-      Debian|debian)
-        printf "** Debian found. Proceeding with innoextract install via apt. You may be prompted for your password. **\n"
+      Debian|debian|linuxmint)
+        printf "** Debian (or Debian-like) found. Proceeding with innoextract install via apt. You may be prompted for your password. **\n"
         sudo apt install innoextract
         ;;
       *)
