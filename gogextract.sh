@@ -49,11 +49,11 @@ extractFiles() {
 removeFiles() {
   # We don't actually know where the DOSBox config files will be from package to package, so
   # find and move them before deleting things. Discard error output if we don't find DOSBox config(s). 
-  printf "** Moving DOSBox configuration files **\n"
+  printf "** Moving DOSBox configuration files (if any are found) **\n"
   find "${DESTDIR}" -iname "dosbox*.conf" -exec mv {} "${DESTDIR}"/ \; 2>/dev/null
   printf "\n"
 
-  printf "** Removing GOG files files from %s/ **\n" "${DESTDIR}";
+  printf "** Removing GOG files from %s/ **\n" "${DESTDIR}";
   find "${DESTDIR}" -type f '(' -name "webcache.zip" -o -name "GameuxInstallHelper.dll" -o -name "goggame*" ')' -exec rm -rfv {} \; \
     2>/dev/null
   find "${DESTDIR}" -type d '(' -name "commonappdata" -o -name "__support" -o -name "__redist" ')' -exec rm -rfv {} \; 2>/dev/null
