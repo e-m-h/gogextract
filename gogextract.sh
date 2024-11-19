@@ -9,7 +9,7 @@ GAMEARCHIVE=${1}
 
 innoextractInstall() {
   if [[ $(uname -s) == 'Linux' ]]; then
-    case $(grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" '{print $2}' | head -n1) in
+    case $(grep -h -E "^ID=|^ID_LIKE=" /etc/*release | awk -F"=" 'NR==1 {print $2}') in
       Fedora|fedora)
         printf "** Fedora found. Proceeding with innoextract install via yum. You may be prompted for your password. **\n"
         sudo yum install innoextract
